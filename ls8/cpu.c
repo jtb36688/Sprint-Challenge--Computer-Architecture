@@ -79,6 +79,16 @@ void cpu_run(struct cpu *cpu)
     int reg;
     unsigned char retaddr;
     switch (ir) {
+      case CMP:
+        if (operand1 == operand2) {
+
+        }
+        else if (operand1 > operand2) {
+
+        }
+        else if (operand1 < operand2) {
+
+        }
       case CALL:
         retaddr = cpu->pc + 2;
         SP--;
@@ -150,6 +160,7 @@ void cpu_init(struct cpu *cpu)
 {
   // TODO: Initialize the PC and other special registers
   cpu->pc = 0;
+  cpu->flag = 0b00000000;
   memset(cpu->registers, 0, 8);
   // set memory array to be all NULL or 0 values.
   memset(cpu->memory, 0, 256);
