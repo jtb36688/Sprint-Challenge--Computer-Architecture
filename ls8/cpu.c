@@ -93,6 +93,16 @@ void cpu_run(struct cpu *cpu)
       case CMP:
         alu(cpu, ALU_CMP, operand1, operand2);
         break;
+      case JEQ:
+        if (cpu->flag == 0b00000001) {
+          cpu->pc = cpu->registers[operand1];
+        }
+        break;
+      case JNE:
+        if (cpu->flag != 0b00000001) {
+          cpu->pc = cpu->registers[operand1];
+        }
+        break;
       case CALL:
         retaddr = cpu->pc + 2;
         SP--;
