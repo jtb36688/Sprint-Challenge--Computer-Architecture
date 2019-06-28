@@ -55,14 +55,15 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
 {
   switch (op) {
     case ALU_CMP:
+    // bitwise operation | leaves any truthy bits on during assignment
         if (cpu->registers[regA] == cpu->registers[regB]) {
-          cpu->flag = 0b00000001;
+          cpu->flag = (cpu->flag | 0b00000001);
         }
         else if (cpu->registers[regA] > cpu->registers[regB]) {
-          cpu->flag = 0b00000010;
+          cpu->flag = (cpu->flag | 0b00000010);
         }
         else if (cpu->registers[regA] < cpu->registers[regB]) {
-          cpu->flag = 0b00000010;
+          cpu->flag = (cpu->flag | 0b00000100);
         }
         break;
     case ALU_MUL:
@@ -94,13 +95,21 @@ void cpu_run(struct cpu *cpu)
         alu(cpu, ALU_CMP, operand1, operand2);
         break;
       case JEQ:
-        if (cpu->flag == 0b00000001) {
+        // if conditional returns 000000000, it is falsey
+        if ((cpu->flag) & 0b00000001) {
           cpu->pc = cpu->registers[operand1];
+        }
+        else {
+          cpu->pc += num_increments;
         }
         break;
       case JNE:
-        if (cpu->flag != 0b00000001) {
+      // if conditional returns 00000000, it is falsey and passes
+        if (!((cpu->flag) & 0b00000001)) {
           cpu->pc = cpu->registers[operand1];
+        }
+        else {
+          cpu->pc += num_increments;
         }
         break;
       case CALL:
@@ -154,7 +163,7 @@ void cpu_run(struct cpu *cpu)
         exit(1);
       
     }
-    if (ir != CALL && ir != RET && ir != JMP) {
+    if (ir != CALL && ir != RET && ir != JMP && ir != JEQ && ir != JNE) {
       cpu->pc += num_increments;
     }
     // TODO
