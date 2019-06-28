@@ -54,6 +54,17 @@ void cpu_ram_write(struct cpu *cpu, int address, char data)
 void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB)
 {
   switch (op) {
+    case ALU_CMP:
+        if (cpu->registers[regA] == cpu->registers[regB]) {
+          cpu->flag = 0b00000001;
+        }
+        else if (cpu->registers[regA] > cpu->registers[regB]) {
+          cpu->flag = 0b00000010;
+        }
+        else if (cpu->registers[regA] < cpu->registers[regB]) {
+          cpu->flag = 0b00000010;
+        }
+        break;
     case ALU_MUL:
       // TODO
       cpu->registers[regA] = cpu->registers[regA] * cpu->registers[regB];
@@ -80,15 +91,8 @@ void cpu_run(struct cpu *cpu)
     unsigned char retaddr;
     switch (ir) {
       case CMP:
-        if (operand1 == operand2) {
-
-        }
-        else if (operand1 > operand2) {
-
-        }
-        else if (operand1 < operand2) {
-
-        }
+        alu(cpu, ALU_CMP, operand1, operand2);
+        break;
       case CALL:
         retaddr = cpu->pc + 2;
         SP--;
